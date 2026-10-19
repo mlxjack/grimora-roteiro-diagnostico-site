@@ -1,0 +1,1242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<title>Grimora · Roteiro de Diagnóstico</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F06719'/%3E%3Ctext x='32' y='45' font-size='38' font-weight='800' text-anchor='middle' font-family='Arial' fill='%23121212'%3EG%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#F7F3ED; --surface:#FFFFFF; --surface-2:#FBF9F5; --ink:#121212; --muted:#625D57; --line:#E2DCD3;
+  --accent:#F06719; --on-accent:#121212; --accent-text:#BF4E08; --accent-soft:#FDEBDD;
+  --good:#1E7F4F; --good-soft:#E4F4EA; --warn:#9A4A06; --warn-soft:#FFF1DC; --danger:#B3261E;
+  --card-dark:#121212; --on-card-dark:#F4EFE8;
+  --shadow:0 1px 2px rgba(18,18,18,.05),0 8px 24px rgba(18,18,18,.06);
+  --r:16px; --topbar-h:64px;
+  --font:Aptos,"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121110; --surface:#1D1B19; --surface-2:#262321; --ink:#F4EFE8; --muted:#A8A096; --line:#37322D;
+    --accent:#FF7A2E; --accent-text:#FF9A5C; --accent-soft:#3A2314;
+    --good:#5CD08F; --good-soft:#16301F; --warn:#FFB066; --warn-soft:#3A2A12; --danger:#FF8A80;
+    --card-dark:#0A0908; --on-card-dark:#F4EFE8; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121110; --surface:#1D1B19; --surface-2:#262321; --ink:#F4EFE8; --muted:#A8A096; --line:#37322D;
+  --accent:#FF7A2E; --accent-text:#FF9A5C; --accent-soft:#3A2314;
+  --good:#5CD08F; --good-soft:#16301F; --warn:#FFB066; --warn-soft:#3A2A12; --danger:#FF8A80;
+  --card-dark:#0A0908; --on-card-dark:#F4EFE8; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 var(--font)}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,p{margin:0}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg{flex:none}
+
+/* ---------- barra superior ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:1280px;margin:0 auto;padding:10px 16px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mark{width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;font-size:17px}
+.brand b{letter-spacing:.2em;font-size:14px;font-weight:800}
+.brand .sub{color:var(--muted);font-size:13px;white-space:nowrap}
+.spacer{flex:1}
+.topprog{height:3px;background:var(--line)}
+.topprog i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;line-height:1.2;text-decoration:none}
+.btn:hover{border-color:color-mix(in srgb,var(--ink) 30%,var(--line))}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent}
+.btn.icon{width:44px;padding:0}
+.btn.small{min-height:36px;padding:0 12px;font-size:15px}
+.btn.danger{color:var(--danger)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.meeting-btn{max-width:min(240px,30vw);justify-content:flex-start}
+@media (max-width:1360px){.brand .sub{display:none}}
+.meeting-btn span.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:2px}
+.timer .t{font-variant-numeric:tabular-nums;font-weight:700;min-width:58px;text-align:center}
+.timer.running .t{color:var(--accent-text)}
+.timer .btn{min-height:40px;width:40px;border:0;background:transparent;padding:0}
+.savechip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:15px}
+.savechip .dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.savechip[data-state="ok"] .dot{background:var(--good)}
+.savechip[data-state="browser"]{background:var(--warn-soft);border-color:transparent}
+.savechip[data-state="browser"] .dot,.savechip[data-state="perm"] .dot{background:var(--warn)}
+.savechip[data-state="perm"]{background:var(--warn-soft);border-color:transparent}
+.savechip[data-state="error"]{background:var(--danger);border-color:var(--danger);color:#fff}
+.savechip[data-state="error"] .dot{background:#fff}
+.banner{background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.banner-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner p{flex:1;min-width:240px;font-size:15px}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:290px minmax(0,1fr);gap:28px;max-width:1280px;margin:0 auto;padding:22px 16px 120px}
+.nav{position:sticky;top:calc(var(--topbar-h) + 16px);align-self:start;max-height:calc(100vh - var(--topbar-h) - 32px);overflow:auto;padding-bottom:8px}
+.progress-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.progress-card .row{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:8px}
+.progress-card .row b{color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.nav-list{display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:transparent;border-radius:12px;padding:8px 10px;min-height:48px;color:var(--ink)}
+.nav-item:hover{background:var(--surface)}
+.nav-item.active{background:var(--surface);box-shadow:inset 3px 0 0 var(--accent),var(--shadow)}
+.nav-item .badge{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:14px;font-weight:700;flex:none;color:var(--muted)}
+.nav-item.active .badge{border-color:var(--accent);color:var(--accent-text)}
+.nav-item.complete .badge{background:var(--good);border-color:var(--good);color:#fff}
+.nav-item .ttl{flex:1;min-width:0;font-size:15px;font-weight:600;line-height:1.25}
+.nav-item .short{display:none}
+.nav-item .meta{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nav-item .flagbadge{display:inline-flex;align-items:center;gap:2px;color:var(--accent-text);font-weight:700}
+
+main{min-width:0}
+.sec-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:18px}
+.sec-num{width:48px;height:48px;border-radius:14px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;font-size:22px;flex:none}
+.sec-head h1{font-size:clamp(26px,3.4vw,36px);line-height:1.15;letter-spacing:-.02em}
+.sec-head .lead{color:var(--muted);margin-top:4px;font-size:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card h2{font-size:19px;margin-bottom:12px}
+.hint{color:var(--muted);font-size:15px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text)}
+
+/* itens */
+.item{display:grid;grid-template-columns:40px minmax(0,1fr) auto;column-gap:12px;row-gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;transition:border-color .15s,box-shadow .15s}
+.item.done{background:var(--surface-2)}
+.item.flag{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.check{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:transparent;display:grid;place-items:center;color:transparent;padding:0}
+.check:hover{border-color:var(--good)}
+.check[aria-checked="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.q{font-size:18px;font-weight:600;line-height:1.35;padding-top:6px}
+.item.done .q{color:var(--muted)}
+.q-input{width:100%;font-weight:600;font-size:18px;border:0;border-bottom:2px dashed var(--line);background:transparent;padding:6px 0;border-radius:0}
+.q-input:focus{outline:none;border-bottom-color:var(--accent)}
+.actions{display:flex;gap:6px;align-items:flex-start}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid transparent;background:transparent;display:grid;place-items:center;color:var(--muted);padding:0}
+.iconbtn:hover{background:var(--surface-2);color:var(--ink)}
+.iconbtn[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.iconbtn[aria-pressed="true"] svg{fill:currentColor}
+.note{grid-column:2/-1}
+textarea.note,textarea.inp,input.inp{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface-2);color:var(--ink);resize:none;min-height:46px;display:block;overflow:hidden;line-height:1.45}
+input.inp{overflow:visible}
+textarea.note:focus,textarea.inp:focus,input.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+textarea::placeholder,input::placeholder{color:color-mix(in srgb,var(--muted) 75%,transparent)}
+.add-row{margin:6px 0 20px}
+.sec-notes{margin-top:8px}
+.sec-notes label{display:block;font-weight:700;margin-bottom:8px}
+
+/* formulários */
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.wide{grid-column:1/-1}
+.field .lbl{font-size:14px;font-weight:700;color:var(--muted)}
+.tiplist{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.tiplist li{display:flex;gap:12px;align-items:flex-start;font-size:18px}
+.tiplist li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:10px;flex:none}
+
+/* pergunta-chave */
+.key-card{background:var(--card-dark);color:var(--on-card-dark);border-radius:20px;padding:28px;margin-bottom:16px;border:1px solid var(--line)}
+.key-card .eyebrow{color:var(--accent)}
+.key-q{font-size:clamp(24px,3.6vw,36px);line-height:1.2;font-weight:700;letter-spacing:-.02em;margin-top:10px}
+.key-q em{font-style:normal;color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:8px 18px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);font-weight:600}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.chip .rank{width:24px;height:24px;border-radius:50%;background:var(--on-accent);color:var(--accent);display:grid;place-items:center;font-size:13px;font-weight:800}
+
+/* resumo / fechamento */
+.flag-list{display:grid;gap:8px}
+.flag-link{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface-2);border-radius:12px;padding:10px 14px}
+.flag-link:hover{border-color:var(--accent)}
+.flag-link .tag{font-size:12px;font-weight:800;color:var(--accent-text);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.flag-link .tx{flex:1;min-width:0}
+.flag-link .tx b{display:block;font-weight:600}
+.flag-link .tx span{display:block;color:var(--muted);font-size:15px;white-space:pre-wrap}
+.sum-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.script{font-size:clamp(19px,2.4vw,24px);line-height:1.5;background:var(--card-dark);color:var(--on-card-dark);border-radius:18px;padding:26px;margin-bottom:16px}
+.script mark{background:none;color:var(--accent);font-weight:700;border-bottom:2px solid var(--accent)}
+.script .blank{color:var(--accent);opacity:.8}
+.closing-end{background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.closing-end h2{margin-bottom:6px}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.tagline{margin-top:28px;text-align:center;color:var(--muted);font-size:14px}
+.tagline b{color:var(--ink);letter-spacing:.14em}
+
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.pager .btn{flex:1;max-width:340px;justify-content:space-between}
+.pager .btn small{display:block;color:var(--muted);font-weight:500;font-size:13px}
+.pager .btn.primary small{color:inherit;opacity:.75}
+.pager .txt{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.pager .next .txt{align-items:flex-end;text-align:right}
+
+/* gaveta de notas */
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);z-index:40;background:var(--surface);border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;padding:16px;gap:12px}
+#drawer[hidden]{display:none}
+#drawer header{display:flex;align-items:center;gap:10px}
+#drawer h2{font-size:19px;flex:1}
+#drawer textarea{flex:1;width:100%;resize:none;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface-2);line-height:1.5;min-height:200px}
+#drawer textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+
+/* diálogos */
+dialog{border:1px solid var(--line);border-radius:20px;padding:0;background:var(--surface);color:var(--ink);box-shadow:0 24px 80px rgba(0,0,0,.35);width:min(680px,calc(100vw - 24px));max-height:calc(100vh - 24px)}
+dialog::backdrop{background:rgba(10,9,8,.55)}
+.dlg{padding:22px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 26px);overflow:auto}
+.dlg header{display:flex;align-items:center;gap:10px}
+.dlg header h2{flex:1;font-size:21px}
+.dlg h3{font-size:16px;margin-bottom:6px}
+.dlg .block{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface-2)}
+.dlg .block p{color:var(--muted);font-size:15px;margin-bottom:10px}
+.status-line{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:10px}
+.status-line .dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.status-line.ok .dot{background:var(--good)}
+.status-line.warn .dot{background:var(--warn)}
+.status-line.err .dot{background:var(--danger)}
+.mlist{display:grid;gap:8px}
+.mrow{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface-2)}
+.mrow.current{border-color:var(--accent);background:var(--accent-soft)}
+.mrow .info{flex:1;min-width:0}
+.mrow .info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow .info span{color:var(--muted);font-size:14px}
+pre.preview{margin:0;white-space:pre-wrap;word-break:break-word;font:14px/1.55 ui-monospace,Consolas,"Cascadia Mono",monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px;max-height:42vh;overflow:auto}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#121212;color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:calc(100vw - 32px);text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.sshort{display:none}
+.t-ico{display:grid;margin-left:8px}
+.fab{display:none;position:fixed;right:16px;bottom:16px;z-index:35;width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+
+/* ---------- celular / tablet ---------- */
+@media (max-width:1000px){
+  .app{grid-template-columns:minmax(0,1fr);gap:12px;padding-top:12px}
+  .nav{position:sticky;top:var(--topbar-h);z-index:20;margin:0 -16px;padding:8px 16px;background:var(--bg);border-bottom:1px solid var(--line);max-height:none;overflow:visible}
+  .progress-card{display:none}
+  .nav-list{flex-direction:row;overflow-x:auto;gap:6px;scrollbar-width:none;padding-bottom:2px}
+  .nav-list::-webkit-scrollbar{display:none}
+  .nav-item{width:auto;flex:none;border:1px solid var(--line);background:var(--surface);padding:6px 14px 6px 8px;min-height:44px;border-radius:99px}
+  .nav-item.active{box-shadow:none;border-color:var(--accent);background:var(--accent-soft)}
+  .nav-item .ttl{display:none}
+  .nav-item .short{display:inline;font-size:14px;font-weight:600;white-space:nowrap}
+  .nav-item .meta{font-size:12px}
+}
+@media (max-width:1000px){
+  .brand b{display:none}
+  .btn .lbl{display:none}
+  .btn.has-lbl{width:44px;padding:0}
+  .meeting-btn.has-lbl{width:auto;padding:0 14px}
+  .meeting-btn .name.lbl{display:block}
+  .savechip .stxt{display:none}
+  .savechip .sshort{display:inline}
+}
+@media (max-width:720px){
+  body{font-size:16px}
+  .topbar{position:static}
+  .topbar-inner{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:8px 10px;align-items:center}
+  .brand{grid-row:1;grid-column:1}
+  .meeting-btn,.meeting-btn.has-lbl{grid-row:1;grid-column:2/5;max-width:none;width:100%}
+  #btnTheme{grid-row:1;grid-column:5}
+  .spacer{display:none}
+  .timer{grid-row:2;grid-column:1/3;justify-self:start}
+  .t-ico{display:none}
+  #chip{grid-row:2;grid-column:3}
+  #btnNotes{grid-row:2;grid-column:4}
+  #btnReport{grid-row:2;grid-column:5}
+  .nav{top:0}
+  .savechip .sshort{display:none}
+  .fab{display:grid}
+  .form-grid,.sum-grid{grid-template-columns:1fr}
+  .sec-num{width:42px;height:42px;font-size:19px}
+  .sec-head .lead{font-size:16px}
+  .card{padding:16px}
+  .q,.q-input{font-size:17px}
+  .key-card{padding:20px}
+  .script{padding:18px}
+  .pager .btn{padding:0 12px}
+  .savechip{padding:0 12px}
+}
+
+/* ---------- impressão ---------- */
+#print{display:none}
+@media print{
+  html,body{background:#fff!important;color:#000!important}
+  body>*:not(#print){display:none!important}
+  #print{display:block;font:11pt/1.45 var(--font);color:#000}
+  #print h1{font-size:22pt;margin:0 0 2pt}
+  #print h2{font-size:13pt;margin:16pt 0 6pt;padding-bottom:3pt;border-bottom:2px solid #F06719;break-after:avoid}
+  #print h3{font-size:11pt;margin:10pt 0 4pt;break-after:avoid}
+  #print .p-brand{font-weight:800;letter-spacing:.2em;color:#F06719;font-size:10pt}
+  #print .p-meta{color:#444;font-size:10pt}
+  #print table{border-collapse:collapse;width:100%;margin:6pt 0}
+  #print td{padding:3pt 8pt 3pt 0;vertical-align:top;font-size:10.5pt}
+  #print td:first-child{width:28%;color:#555;font-weight:700}
+  #print .qa{margin:0 0 7pt;break-inside:avoid}
+  #print .qa .q{font-size:10.5pt;font-weight:700;padding:0}
+  #print .qa .a{margin:1pt 0 0;white-space:pre-wrap;padding-left:10pt;border-left:2px solid #ccc}
+  #print .qa.flag .q::before{content:"⚑ ";color:#F06719}
+  #print .none{color:#777;font-style:italic}
+  @page{margin:16mm 14mm}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="mark">G</span><b>GRIMORA</b><span class="sub">Diagnóstico de Marketing</span></div>
+    <button class="btn ghost meeting-btn has-lbl" id="btnMeetings" type="button" title="Reuniões salvas / nova reunião">
+      <span data-icon="folder"></span><span class="name lbl" id="meetingName">Reunião</span>
+    </button>
+    <div class="spacer"></div>
+    <div class="timer" id="timer" title="Cronômetro da reunião">
+      <span data-icon="clock" class="t-ico"></span>
+      <span class="t" id="timerText">00:00</span>
+      <button class="btn" id="btnTimer" type="button" aria-label="Iniciar cronômetro"></button>
+      <button class="btn" id="btnTimerReset" type="button" aria-label="Zerar cronômetro" title="Zerar"><span data-icon="reset" style="display:grid"></span></button>
+    </div>
+    <button class="savechip" id="chip" type="button" data-state="browser"><span class="dot"></span><span class="stxt" id="chipText">Salvando…</span><span class="sshort" id="chipShort"></span></button>
+    <button class="btn has-lbl" id="btnNotes" type="button" title="Bloco de notas livre"><span data-icon="pencil"></span><span class="lbl">Bloco de notas</span></button>
+    <button class="btn has-lbl" id="btnReport" type="button" title="Relatório, imprimir, PDF"><span data-icon="file"></span><span class="lbl">Relatório</span></button>
+    <button class="btn icon" id="btnTheme" type="button" aria-label="Alternar tema claro/escuro"></button>
+  </div>
+  <div class="topprog" title="Progresso da conversa"><i id="topprogFill"></i></div>
+</header>
+
+<div class="banner" id="banner" hidden>
+  <div class="banner-inner">
+    <p id="bannerText"></p>
+    <button class="btn primary small" id="bannerAction" type="button">Vincular arquivo</button>
+    <button class="btn small ghost" id="bannerClose" type="button">Entendi</button>
+  </div>
+</div>
+
+<div class="app">
+  <nav class="nav" id="nav" aria-label="Seções do roteiro"></nav>
+  <main id="main"></main>
+</div>
+
+<button class="fab" id="fabNotes" type="button" aria-label="Abrir bloco de notas"><span data-icon="pencil" style="display:grid"></span></button>
+
+<aside id="drawer" hidden aria-label="Bloco de notas livre">
+  <header>
+    <h2>Bloco de notas</h2>
+    <button class="btn small" id="btnStamp" type="button" title="Insere o horário do cronômetro"><span data-icon="clock" style="display:grid"></span>Inserir hora</button>
+    <button class="iconbtn" id="btnDrawerClose" type="button" aria-label="Fechar bloco de notas"><span data-icon="x" style="display:grid"></span></button>
+  </header>
+  <p class="hint">Para o que não cabe em nenhuma pergunta: ideias soltas, nomes, números, pendências.</p>
+  <textarea id="scratch" placeholder="Escreva livremente…"></textarea>
+</aside>
+
+<dialog id="dlgSave"><div class="dlg" id="saveBody"></div></dialog>
+<dialog id="dlgMeetings"><div class="dlg" id="meetingsBody"></div></dialog>
+<dialog id="dlgReport"><div class="dlg" id="reportBody"></div></dialog>
+<dialog id="dlgAsk"><form method="dialog" class="dlg" id="askBody"></form></dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="print"></div>
+<input type="file" id="fileInput" accept=".json,application/json" hidden>
+<noscript><p style="padding:24px">Este roteiro precisa de JavaScript para funcionar.</p></noscript>
+
+<script>
+(function () {
+'use strict';
+
+/* =====================================================================
+   CONTEÚDO DO ROTEIRO (baseado no PPTX "Roteiro Diagnóstico Lanchonete")
+   ===================================================================== */
+const SECTIONS = [
+  { id:'intro', kind:'intro', short:'Início', title:'Antes de começar',
+    lead:'Objetivo: conduzir uma conversa, não um interrogatório.',
+    tips:[
+      'Comece entendendo a história da lanchonete e deixe o cliente falar.',
+      'Evite apresentar pacote ou preço antes de entender o problema.',
+      'Anote números, nomes de canais, produtos e dias/horários citados.',
+      'Quando surgir uma dor, aprofunde: “por que isso acontece hoje?”',
+      'No final, repita o que entendeu e confirme se as prioridades estão corretas.'
+    ]},
+  { id:'negocio', kind:'questions', n:1, short:'Negócio', title:'Entendendo o negócio',
+    lead:'Primeiro, descubra como a operação funciona.', items:[
+      'Há quanto tempo a lanchonete está funcionando?',
+      'Qual é o principal diferencial de vocês hoje?',
+      'Quem é o cliente que mais compra? Família, jovens, trabalhadores da região, delivery...?',
+      'Quais produtos mais vendem?',
+      'Quais produtos vocês gostariam de vender mais?',
+      'Qual produto ou categoria dá a melhor margem?',
+      'Quem vocês consideram os principais concorrentes na região?'
+    ]},
+  { id:'vendas', kind:'questions', n:2, short:'Vendas', title:'Como as vendas acontecem',
+    lead:'Descubra de onde vem o dinheiro — e onde há espaço para crescer.', items:[
+      'Hoje, de onde vêm a maioria dos pedidos: salão, balcão, WhatsApp, iFood ou outro app?',
+      'Vocês têm uma noção do ticket médio por pedido?',
+      'Quais são os dias e horários de maior movimento?',
+      'Quais são os dias e horários mais fracos?',
+      'Existe alguma meta de pedidos ou faturamento que vocês gostariam de alcançar?',
+      'Tem algum canal que vocês gostariam de fazer crescer mais?',
+      'Hoje vocês sentem que falta gente conhecendo a lanchonete ou falta converter quem já conhece?'
+    ]},
+  { id:'instagram', kind:'questions', n:3, short:'Instagram', title:'Instagram e conteúdo',
+    lead:'Entenda o que já é feito antes de propor uma rotina nova.', items:[
+      'Quem cuida do Instagram hoje?',
+      'Com que frequência vocês publicam?',
+      'Vocês costumam gravar vídeos e tirar fotos dos produtos?',
+      'Alguém da equipe toparia aparecer em Reels ou vídeos?',
+      'Que tipo de postagem vocês percebem que traz mais retorno?',
+      'Existe alguma identidade visual ou padrão que vocês querem manter?',
+      'Tem alguma coisa no Instagram atual que vocês não gostam?'
+    ]},
+  { id:'anuncios', kind:'questions', n:4, short:'Anúncios', title:'Anúncios e promoções',
+    lead:'Aqui você identifica histórico, expectativa e verba.', items:[
+      'Vocês já fizeram anúncios no Instagram, Facebook ou Google?',
+      'Se já fizeram: o que anunciaram e qual foi o resultado?',
+      'Quanto costumavam investir em mídia?',
+      'Quais promoções já funcionaram bem?',
+      'Vocês costumam criar combos ou ofertas para dias de menor movimento?',
+      'Existe alguma promoção que vocês não querem mais fazer?',
+      'Qual seria um bom resultado de uma campanha para vocês?'
+    ]},
+  { id:'google', kind:'questions', n:5, short:'Google', title:'Google e presença local',
+    lead:'Para lanchonete, busca local pode valer tanto quanto Instagram.', items:[
+      'Vocês têm Perfil da Empresa no Google atualizado?',
+      'Quem responde às avaliações?',
+      'Vocês costumam pedir avaliação para clientes satisfeitos?',
+      'Horário, telefone, endereço, cardápio e fotos estão atualizados?',
+      'Quando alguém pesquisa pelo tipo de lanche na região, vocês aparecem bem?',
+      'Já tiveram problemas com informações erradas no Google?'
+    ]},
+  { id:'site', kind:'questions', n:6, short:'Site e pedidos', title:'Site, cardápio e pedidos',
+    lead:'Mapeie o caminho entre ver o produto e finalizar a compra.', items:[
+      'Vocês têm site ou cardápio digital próprio?',
+      'Hoje, qual é o caminho mais fácil para um cliente fazer um pedido?',
+      'O cardápio funciona bem no celular?',
+      'Os preços e produtos são atualizados com facilidade?',
+      'Existe interesse em levar mais pedidos para WhatsApp ou canal próprio?',
+      'Vocês gostariam de depender menos dos aplicativos de delivery?',
+      'Há necessidade de mostrar localização, horário, promoções ou eventos no site?'
+    ]},
+  { id:'fidelizacao', kind:'questions', n:7, short:'Fidelização', title:'Fidelização e WhatsApp',
+    lead:'O cliente que já comprou costuma ser mais barato de trazer de volta.', items:[
+      'Vocês têm uma base de clientes ou contatos autorizados no WhatsApp?',
+      'Fazem alguma ação para incentivar a segunda compra?',
+      'Existe programa de fidelidade, cupom ou benefício para clientes recorrentes?',
+      'Divulgam novidades e lançamentos para clientes antigos?',
+      'Vocês sabem aproximadamente quantos clientes voltam a comprar?',
+      'Há interesse em campanhas específicas para aniversários, datas especiais ou clientes inativos?'
+    ]},
+  { id:'chave', kind:'important', n:8, short:'Pergunta-chave', title:'A pergunta mais importante',
+    lead:'Faça essa pergunta e dê espaço para eles responderem.' },
+  { id:'investimento', kind:'questions', n:9, short:'Investimento', title:'Investimento e decisão',
+    lead:'Chegue em orçamento só depois de entender valor e prioridade.', items:[
+      'Hoje vocês já têm algum valor destinado a marketing?',
+      'Além do serviço da agência, existe verba disponível para anúncios?',
+      'Existe um valor mensal que vocês imaginavam investir?',
+      'Quem participa da decisão sobre contratação?',
+      'Existe alguma data ou campanha que faça sentido usar como início?',
+      'Preferem começar com uma frente específica ou já integrar conteúdo, anúncios, Google e site?'
+    ]},
+  { id:'observar', kind:'observe', n:10, short:'Observar', title:'O que observar sem perguntar',
+    lead:'Faça seu próprio diagnóstico enquanto estiver no local.', items:[
+      'Fachada, comunicação visual e facilidade para encontrar a loja.',
+      'Qualidade das fotos e apresentação do cardápio.',
+      'Embalagens, adesivos, QR Codes e materiais no balcão.',
+      'Experiência para pedir pelo WhatsApp e tempo de resposta.',
+      'Como promoções e combos são apresentados.',
+      'Movimento do salão e perfil aparente dos clientes.',
+      'Consistência entre Instagram, Google, cardápio e identidade da marca.'
+    ]},
+  { id:'resumo', kind:'summary', n:11, short:'Resumo', title:'Resumo do diagnóstico',
+    lead:'Antes de ir embora, organize mentalmente o que você ouviu.',
+    foot:'Tente sair da reunião sabendo exatamente qual problema a Grimora vai ajudar a resolver.' },
+  { id:'fechamento', kind:'closing', n:12, short:'Fechamento', title:'Fechamento da reunião',
+    lead:'Repita o que entendeu e combine o próximo passo.' }
+];
+const DREAMS = ['Mais pedidos no delivery','Mais movimento no salão','Mais clientes novos','Mais recorrência','Mais vendas em dias fracos','Mais reconhecimento da marca na região'];
+const SERVICES = ['Conteúdo e Instagram','Anúncios pagos (Meta / Google)','Google e Perfil da Empresa','Site e cardápio digital','WhatsApp e fidelização','Identidade visual'];
+
+/* =====================================================================
+   UTILITÁRIOS
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+function el(tag, props = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'dataset') Object.assign(e.dataset, v);
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k.startsWith('aria-') || k === 'role') e.setAttribute(k, v);
+    else if (k in e) e[k] = v;
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat(Infinity)) if (kid != null && kid !== false) e.append(kid.nodeType ? kid : String(kid));
+  return e;
+}
+const ICONS = {
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+  pause:'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+  reset:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+  printer:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  pencil:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  folder:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  left:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  right:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
+};
+function icon(name, size = 20) {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  for (const [k, v] of Object.entries({ viewBox:'0 0 24 24', width:size, height:size, fill:'none', stroke:'currentColor', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'aria-hidden':'true' })) s.setAttribute(k, v);
+  s.innerHTML = ICONS[name] || '';
+  return s;
+}
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
+const pad = n => String(n).padStart(2, '0');
+function nowLocalInput() { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); }
+function todayStamp() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function fmtDT(v) { if (!v) return ''; try { const d = new Date(v); return isNaN(d) ? v : d.toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: v.length > 10 ? 'short' : undefined }); } catch { return v; } }
+function fmtDate(v) { if (!v) return ''; try { const d = new Date(v + 'T00:00'); return isNaN(d) ? v : d.toLocaleDateString('pt-BR', { dateStyle: 'long' }); } catch { return v; } }
+function fmtClock(ms) { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? `${h}:${pad(m)}:${pad(s % 60)}` : `${pad(m)}:${pad(s % 60)}`; }
+function fmtDur(ms) { const m = Math.round(ms / 60000); return m >= 60 ? `${Math.floor(m / 60)}h ${pad(m % 60)}min` : `${m} min`; }
+function fmtHM(ts) { return new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+function slug(s) { return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
+function autosize(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+function autosizeAll() { $$('textarea.note, textarea.inp').forEach(autosize); }
+let toastTimer;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3200); }
+function download(name, text, type) {
+  const blob = new Blob([text], { type });
+  const a = el('a', { href: URL.createObjectURL(blob), download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); toast('Copiado.'); return; } catch (_) {}
+  const ta = el('textarea', { value: text, style: 'position:fixed;opacity:0' });
+  document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); toast('Copiado.'); } catch (_) { toast('Não consegui copiar — selecione e copie manualmente.'); }
+  ta.remove();
+}
+function ask({ title, text, ok = 'Confirmar', cancel = 'Cancelar', danger = false }) {
+  return new Promise(res => {
+    const d = $('#dlgAsk'), f = $('#askBody');
+    f.replaceChildren(
+      el('h2', {}, title), el('p', { class: 'hint', style: 'font-size:16px;color:var(--ink)' }, text),
+      el('div', { class: 'btn-row', style: 'justify-content:flex-end' },
+        el('button', { class: 'btn', value: 'cancel' }, cancel),
+        el('button', { class: 'btn ' + (danger ? 'danger' : 'primary'), value: 'ok', style: danger ? 'border-color:var(--danger)' : '' }, ok)));
+    d.returnValue = '';
+    d.addEventListener('close', () => res(d.returnValue === 'ok'), { once: true });
+    d.showModal();
+  });
+}
+
+/* =====================================================================
+   ESTADO E PERSISTÊNCIA
+   Camada 1: localStorage (automático)   Camada 2: arquivo no PC (File System
+   Access API, automático após vincular)   Camada 3: backup .json / relatório
+   ===================================================================== */
+const LS_KEY = 'grimora.diagnostico.v1';
+const FS = 'showSaveFilePicker' in window;
+
+function newMeeting() {
+  return {
+    id: uid(), createdAt: Date.now(), updatedAt: Date.now(),
+    info: { negocio: '', contato: '', telefone: '', instagram: '', data: nowLocalInput(), local: '', participantes: '' },
+    items: {}, custom: {}, secNotes: {},
+    dream: [], dreamOther: '', dreamQuote: '',
+    services: [], servicesOther: '',
+    resumo: { op1: '', op2: '', op3: '', prioridade: '', proxima: '' },
+    closing: { proposta: '', quem: '', retorno: '' },
+    scratch: '', timer: { ms: 0, since: null, seen: null }, ui: { section: 'intro' }
+  };
+}
+function normalize(m) {
+  const d = newMeeting(), o = Object.assign(d, m || {});
+  o.info = Object.assign(newMeeting().info, m && m.info);
+  o.resumo = Object.assign(newMeeting().resumo, m && m.resumo);
+  o.closing = Object.assign(newMeeting().closing, m && m.closing);
+  o.timer = Object.assign({ ms: 0, since: null, seen: null }, m && m.timer);
+  o.ui = Object.assign({ section: 'intro' }, m && m.ui);
+  for (const k of ['items', 'custom', 'secNotes']) if (!o[k] || typeof o[k] !== 'object') o[k] = {};
+  for (const k of ['dream', 'services']) if (!Array.isArray(o[k])) o[k] = [];
+  if (!SECTIONS.some(s => s.id === o.ui.section)) o.ui.section = 'intro';
+  return o;
+}
+function readStore() {
+  try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s && typeof s === 'object') return { meetings: s.meetings || {}, currentId: s.currentId || null, settings: s.settings || {} }; } catch (_) {}
+  return { meetings: {}, currentId: null, settings: {} };
+}
+function writeStore(s) { localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+
+let settings = readStore().settings;
+let M;                       // reunião atual
+let lsOk = true, lastSaved = null;
+let saveTimer = null, fileTimer = null;
+let fileHandle = null, fileState = 'none', fileSaved = null, fileErr = '', dirtyFile = false;
+let writeChain = Promise.resolve();
+
+function saveSettings() { try { const s = readStore(); s.settings = settings; writeStore(s); } catch (_) {} }
+function touch(bump = true) {
+  if (bump) { M.updatedAt = Date.now(); dirtyFile = true; }
+  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 350);
+  updateChip('saving');
+}
+function flush() {
+  clearTimeout(saveTimer); saveTimer = null;
+  persistLS();
+  if (fileHandle) scheduleFileWrite();
+}
+function persistLS() {
+  try {
+    if (M.timer.since) M.timer.seen = Date.now();
+    const s = readStore();
+    s.meetings[M.id] = M; s.currentId = M.id; s.settings = settings;
+    writeStore(s); lsOk = true; lastSaved = Date.now();
+  } catch (e) { lsOk = false; }
+  updateChip();
+}
+function exportPayload() { return { app: 'grimora-diagnostico', version: 1, exportedAt: new Date().toISOString(), meeting: M }; }
+function backupName() { return `grimora-diagnostico-${slug(M.info.negocio) || 'reuniao'}-${todayStamp()}.json`; }
+
+/* --- IndexedDB: guarda o "atalho" do arquivo vinculado de cada reunião --- */
+function idbOpen() { return new Promise((res, rej) => { const r = indexedDB.open('grimora-diagnostico', 1); r.onupgradeneeded = () => r.result.createObjectStore('handles'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function idbGet(k) { try { const db = await idbOpen(); return await new Promise((res, rej) => { const q = db.transaction('handles').objectStore('handles').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); } catch (_) { return undefined; } }
+async function idbSet(k, v) { try { const db = await idbOpen(); await new Promise((res, rej) => { const t = db.transaction('handles', 'readwrite'); t.objectStore('handles').put(v, k); t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch (_) {} }
+async function idbDel(k) { try { const db = await idbOpen(); await new Promise((res, rej) => { const t = db.transaction('handles', 'readwrite'); t.objectStore('handles').delete(k); t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch (_) {} }
+
+/* --- arquivo no computador --- */
+function scheduleFileWrite() {
+  clearTimeout(fileTimer);
+  fileTimer = setTimeout(() => { writeChain = writeChain.then(writeFile).catch(() => {}); }, 500);
+}
+async function writeFile() {
+  if (!fileHandle) return;
+  try {
+    if ((await fileHandle.queryPermission({ mode: 'readwrite' })) !== 'granted') { fileState = 'perm'; updateChip(); return; }
+    const data = JSON.stringify(exportPayload(), null, 2);
+    const w = await fileHandle.createWritable();
+    await w.write(data); await w.close();
+    fileState = 'ok'; fileSaved = Date.now(); fileErr = ''; dirtyFile = false;
+  } catch (e) { fileState = 'error'; fileErr = e && e.message || 'erro desconhecido'; }
+  updateChip();
+}
+async function loadHandle() {
+  fileHandle = null; fileState = 'none'; fileSaved = null; dirtyFile = false;
+  if (FS) {
+    fileHandle = (await idbGet(M.id)) || null;
+    if (fileHandle) {
+      try { fileState = (await fileHandle.queryPermission({ mode: 'readwrite' })) === 'granted' ? 'ok' : 'perm'; } catch (_) { fileState = 'perm'; }
+      if (fileState === 'ok') { scheduleFileWrite(); }
+    }
+  }
+  updateChip(); updateBanner();
+}
+async function linkFile() {
+  if (!FS) return;
+  try {
+    const h = await window.showSaveFilePicker({ suggestedName: backupName(), types: [{ description: 'Anotações da reunião (JSON)', accept: { 'application/json': ['.json'] } }] });
+    fileHandle = h; await idbSet(M.id, h); fileState = 'ok';
+    await writeFile();
+    toast('Arquivo vinculado — a partir de agora salva sozinho.');
+  } catch (e) { if (e && e.name !== 'AbortError') toast('Não consegui vincular o arquivo: ' + e.message); }
+  updateChip(); updateBanner(); refreshDialogs();
+}
+async function reconnectFile() {
+  try {
+    const p = await fileHandle.requestPermission({ mode: 'readwrite' });
+    if (p === 'granted') { fileState = 'ok'; await writeFile(); toast('Arquivo reconectado.'); } else toast('Permissão negada.');
+  } catch (e) { toast('Não consegui reconectar: ' + e.message); }
+  updateChip(); refreshDialogs();
+}
+async function unlinkFile() {
+  fileHandle = null; fileState = 'none'; await idbDel(M.id);
+  updateChip(); updateBanner(); refreshDialogs(); toast('Arquivo desvinculado (o arquivo continua no seu computador).');
+}
+async function openBackup() {
+  if (window.showOpenFilePicker) {
+    try {
+      const [h] = await window.showOpenFilePicker({ types: [{ description: 'Anotações da reunião (JSON)', accept: { 'application/json': ['.json'] } }] });
+      const f = await h.getFile(); await importFromText(await f.text(), h);
+    } catch (e) { if (e && e.name !== 'AbortError') toast('Não consegui abrir: ' + e.message); }
+  } else $('#fileInput').click();
+}
+async function importFromText(text, handle) {
+  let data; try { data = JSON.parse(text); } catch (_) { toast('Esse arquivo não é um backup válido.'); return; }
+  const m = data && data.app === 'grimora-diagnostico' && data.meeting;
+  if (!m || !m.id) { toast('Esse arquivo não é um backup do roteiro.'); return; }
+  flush();
+  const cur = readStore().meetings[m.id];
+  if (cur && cur.updatedAt > (m.updatedAt || 0)) {
+    const ok = await ask({ title: 'Substituir a versão do navegador?', text: 'Neste navegador existe uma versão mais recente dessa reunião do que a do arquivo. Substituir mesmo assim?', ok: 'Substituir', danger: true });
+    if (!ok) return;
+  }
+  M = normalize(m); persistLS();
+  if (handle) await idbSet(M.id, handle);
+  await loadHandle();
+  closeDialogs(); renderAll(); toast('Reunião aberta.');
+}
+
+/* =====================================================================
+   CONSULTAS DE PROGRESSO
+   ===================================================================== */
+const rawItems = (sec, m = M) => [
+  ...(sec.items || []).map((t, i) => ({ id: `${sec.id}.${i}`, text: t })),
+  ...((m.custom[sec.id] || []).map(c => ({ id: c.id, text: c.text, custom: true, ref: c })))
+];
+const countedItems = (sec, m = M) => rawItems(sec, m).filter(i => !i.custom || i.text.trim());
+function stats(sec, m = M) {
+  let done = 0, flags = 0; const its = countedItems(sec, m);
+  for (const it of its) { const s = m.items[it.id]; if (s && s.done) done++; if (s && s.flag) flags++; }
+  return { total: its.length, done, flags };
+}
+function status(sec, m = M) {
+  switch (sec.kind) {
+    case 'intro': { const n = ['negocio', 'contato', 'telefone'].filter(k => (m.info[k] || '').trim()).length; return { label: n ? `${n}/3` : '', done: n === 3 }; }
+    case 'questions': case 'observe': { const s = stats(sec, m); return { label: `${s.done}/${s.total}`, done: s.total > 0 && s.done === s.total, flags: s.flags }; }
+    case 'important': return { label: m.dream.length ? String(m.dream.length) : '', done: m.dream.length > 0 };
+    case 'summary': { const r = m.resumo; const n = [r.op1, r.op2, r.op3, r.prioridade, r.proxima].filter(v => v.trim()).length + ((m.services.length || m.servicesOther.trim()) ? 1 : 0); return { label: `${n}/6`, done: n === 6 }; }
+    case 'closing': { const c = m.closing; const n = [c.proposta, c.quem, c.retorno].filter(Boolean).length; return { label: `${n}/3`, done: n === 3 }; }
+  }
+  return { label: '', done: false };
+}
+function overall(m = M) { let d = 0, t = 0; for (const s of SECTIONS) if (s.kind === 'questions' || s.kind === 'observe') { const x = stats(s, m); d += x.done; t += x.total; } return { done: d, total: t }; }
+function flaggedList() {
+  const out = [];
+  for (const sec of SECTIONS) for (const it of countedItems(sec)) { const s = M.items[it.id]; if (s && s.flag) out.push({ sec, it, s }); }
+  return out;
+}
+
+/* =====================================================================
+   TIMER
+   ===================================================================== */
+const elapsed = () => M.timer.ms + (M.timer.since ? Date.now() - M.timer.since : 0);
+function renderTimer() {
+  const run = !!M.timer.since;
+  $('#timer').classList.toggle('running', run);
+  $('#timerText').textContent = fmtClock(elapsed());
+  const b = $('#btnTimer'); b.replaceChildren(icon(run ? 'pause' : 'play', 18));
+  b.setAttribute('aria-label', run ? 'Pausar cronômetro' : 'Iniciar cronômetro');
+}
+function toggleTimer() {
+  if (M.timer.since) { M.timer.ms += Date.now() - M.timer.since; M.timer.since = null; } else M.timer.since = Date.now();
+  touch(); renderTimer();
+}
+async function resetTimer() {
+  if (elapsed() > 60000 && !(await ask({ title: 'Zerar o cronômetro?', text: `Ele está marcando ${fmtClock(elapsed())}.`, ok: 'Zerar', danger: true }))) return;
+  M.timer = { ms: 0, since: null, seen: null }; touch(); renderTimer();
+}
+function settleTimerOnLoad() {
+  const t = M.timer;
+  if (t.since) {
+    const seen = t.seen || t.since;
+    if (Date.now() - seen > 120000) { t.ms += Math.max(0, seen - t.since); t.since = null; }
+  }
+}
+
+/* =====================================================================
+   TOPO, STATUS E TEMA
+   ===================================================================== */
+function updateChip(forced) {
+  const chip = $('#chip'), txt = $('#chipText'); if (!chip) return;
+  let state = 'browser', text = '';
+  const hm = lastSaved ? fmtHM(lastSaved) : '';
+  if (!lsOk) { state = 'error'; text = 'Não salvou! Baixe o backup'; }
+  else if (forced === 'saving') { state = fileHandle && fileState === 'ok' ? 'ok' : (fileState === 'perm' ? 'perm' : 'browser'); text = 'Salvando…'; }
+  else if (fileState === 'ok') { state = 'ok'; text = fileSaved ? `Salvo no arquivo · ${fmtHM(fileSaved)}` : `Arquivo: ${fileHandle.name}`; }
+  else if (fileState === 'perm') { state = 'perm'; text = 'Reconectar arquivo'; }
+  else if (fileState === 'error') { state = 'error'; text = 'Erro no arquivo — veja'; }
+  else { state = FS ? 'browser' : 'ok'; text = `Salvo no navegador${hm ? ' · ' + hm : ''}`; if (FS) text = `Só neste navegador${hm ? ' · ' + hm : ''}`; }
+  chip.dataset.state = state; txt.textContent = text;
+  $('#chipShort').textContent = forced === 'saving' ? 'Salvando…' : ({ ok: 'Salvo', browser: 'Navegador', perm: 'Reconectar', error: 'Erro' })[state];
+  chip.title = text;
+}
+function updateBanner() {
+  const b = $('#banner');
+  const need = !settings.bannerDismissed && !fileHandle;
+  b.hidden = !need; if (!need) return;
+  $('#bannerText').textContent = FS
+    ? 'Suas anotações já são salvas automaticamente neste navegador. Para ter também uma cópia segura no seu computador (que não some se limpar o navegador), vincule um arquivo — leva 5 segundos.'
+    : 'Suas anotações são salvas automaticamente neste navegador. Ao final da reunião, use “Baixar backup” ou “Relatório” para guardar uma cópia no computador (este navegador não permite salvar direto em arquivo — o Chrome ou Edge permitem).';
+  $('#bannerAction').textContent = FS ? 'Vincular arquivo' : 'Ver opções de salvamento';
+}
+function applyTheme() {
+  const t = settings.theme;
+  if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  const dark = t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches);
+  const b = $('#btnTheme'); b.replaceChildren(icon(dark ? 'sun' : 'moon'));
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme === 'dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  settings.theme = dark ? 'light' : 'dark'; saveSettings(); applyTheme();
+}
+function renderTop() { $('#meetingName').textContent = M.info.negocio.trim() || 'Reunião sem nome'; }
+function updateTopbarHeight() { document.documentElement.style.setProperty('--topbar-h', $('#topbar').offsetHeight + 'px'); }
+
+/* =====================================================================
+   NAVEGAÇÃO
+   ===================================================================== */
+const navRefs = {};
+function renderNav() {
+  const nav = $('#nav'); nav.replaceChildren();
+  const pc = el('div', { class: 'progress-card' },
+    el('div', { class: 'row' }, el('span', {}, 'Progresso da conversa'), el('b', { id: 'ovText' }, '')),
+    el('div', { class: 'bar' }, el('i', { id: 'ovFill' })));
+  const list = el('div', { class: 'nav-list' });
+  for (const sec of SECTIONS) {
+    const badge = el('span', { class: 'badge' });
+    const count = el('span', {}); const flag = el('span', { class: 'flagbadge' });
+    const btn = el('button', { class: 'nav-item', type: 'button', onclick: () => go(sec.id) },
+      badge, el('span', { class: 'ttl' }, sec.title), el('span', { class: 'short' }, sec.short),
+      el('span', { class: 'meta' }, flag, count));
+    navRefs[sec.id] = { btn, badge, count, flag, sec };
+    list.append(btn);
+  }
+  nav.append(pc, list);
+  updateNav();
+}
+function updateNav() {
+  for (const id in navRefs) {
+    const r = navRefs[id], st = status(r.sec);
+    r.btn.classList.toggle('active', M.ui.section === id);
+    r.btn.classList.toggle('complete', st.done);
+    r.btn.setAttribute('aria-current', M.ui.section === id ? 'step' : 'false');
+    r.badge.replaceChildren(st.done ? icon('check', 16) : (r.sec.n != null ? String(r.sec.n) : icon('play', 14)));
+    r.count.textContent = st.label || '';
+    r.flag.replaceChildren(); if (st.flags) r.flag.append(icon('flag', 13), String(st.flags));
+  }
+  const o = overall(), pct = o.total ? Math.round(o.done / o.total * 100) : 0;
+  const ov = $('#ovText'); if (ov) { ov.textContent = `${o.done} de ${o.total} tópicos`; $('#ovFill').style.width = pct + '%'; }
+  $('#topprogFill').style.width = pct + '%';
+  const act = navRefs[M.ui.section]; const list = act && act.btn.parentElement;
+  if (act && list && list.scrollWidth > list.clientWidth) list.scrollLeft = act.btn.offsetLeft - list.clientWidth / 2 + act.btn.offsetWidth / 2;
+}
+function go(id, scroll = true) {
+  if (!SECTIONS.some(s => s.id === id)) return;
+  M.ui.section = id; touch(false);
+  renderSection(scroll); updateNav();
+}
+function goItem(secId, itemId) {
+  go(secId, false);
+  const node = $(`[data-id="${CSS.escape(itemId)}"]`);
+  if (node) { node.scrollIntoView({ block: 'center', behavior: 'smooth' }); const t = $('textarea', node); if (t) setTimeout(() => t.focus({ preventScroll: true }), 250); }
+}
+const idx = () => SECTIONS.findIndex(s => s.id === M.ui.section);
+
+/* =====================================================================
+   SEÇÕES
+   ===================================================================== */
+function renderSection(scroll = true) {
+  const sec = SECTIONS[idx()] || SECTIONS[0];
+  const main = $('#main'); main.replaceChildren();
+  const num = sec.n != null ? String(sec.n) : null;
+  main.append(el('div', { class: 'sec-head' },
+    el('div', { class: 'sec-num', 'aria-hidden': 'true' }, num != null ? num : icon('play', 22)),
+    el('div', {}, el('h1', {}, sec.title), el('p', { class: 'lead' }, sec.lead))));
+  ({ intro: viewIntro, questions: viewItems, observe: viewItems, important: viewImportant, summary: viewSummary, closing: viewClosing }[sec.kind])(sec, main);
+  main.append(pager());
+  requestAnimationFrame(autosizeAll);
+  if (scroll) window.scrollTo({ top: 0 });
+}
+function pager() {
+  const i = idx(), prev = SECTIONS[i - 1], next = SECTIONS[i + 1];
+  const mk = (s, dir) => el('button', { class: 'btn ' + (dir === 'next' ? 'primary next' : 'prev'), type: 'button', onclick: () => go(s.id) },
+    dir === 'prev' ? icon('left') : null,
+    el('span', { class: 'txt' }, el('small', {}, dir === 'next' ? 'Próxima' : 'Anterior'), el('span', {}, s.n != null ? `${s.n}. ${s.title}` : s.title)),
+    dir === 'next' ? icon('right') : null);
+  return el('div', { class: 'pager' }, prev ? mk(prev, 'prev') : el('span'), next ? mk(next, 'next') : el('span'));
+}
+function field(label, get, set, o = {}) {
+  const input = o.multiline ? el('textarea', { class: 'inp', rows: 2, placeholder: o.placeholder || '' }) : el('input', { class: 'inp', type: o.type || 'text', placeholder: o.placeholder || '', autocomplete: 'off' });
+  input.value = get() || '';
+  input.addEventListener('input', () => { set(input.value); if (o.multiline) autosize(input); touch(); updateNav(); renderTop(); if (o.onInput) o.onInput(); });
+  return el('label', { class: 'field' + (o.wide ? ' wide' : '') }, el('span', { class: 'lbl' }, label), input);
+}
+function notesBlock(sec) {
+  const t = el('textarea', { class: 'inp', rows: 3, placeholder: 'Observações gerais, ideias, o que ficou no ar…' });
+  t.value = M.secNotes[sec.id] || '';
+  t.addEventListener('input', () => { M.secNotes[sec.id] = t.value; autosize(t); touch(); });
+  return el('div', { class: 'card sec-notes' }, el('label', { for: 'sn-' + sec.id }, 'Anotações livres desta seção'), (t.id = 'sn-' + sec.id, t));
+}
+
+function viewIntro(sec, main) {
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'Postura da conversa'), el('ul', { class: 'tiplist' }, sec.tips.map(t => el('li', {}, el('span', {}, t))))));
+  const I = M.info, f = (label, key, o) => field(label, () => I[key], v => { I[key] = v; }, o);
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'Dados da reunião'),
+    el('div', { class: 'form-grid' },
+      f('Nome da lanchonete', 'negocio', { placeholder: 'Ex.: Lanchonete do Zé', wide: true }),
+      f('Contato (nome e cargo)', 'contato', { placeholder: 'Ex.: Maria, proprietária' }),
+      f('Telefone / WhatsApp', 'telefone', { type: 'tel', placeholder: '(00) 00000-0000' }),
+      f('Instagram', 'instagram', { placeholder: '@perfil' }),
+      f('Data e hora', 'data', { type: 'datetime-local' }),
+      f('Local', 'local', { placeholder: 'Endereço ou “online”' }),
+      f('Quem participa da reunião', 'participantes', { multiline: true, placeholder: 'Nomes e funções', wide: true }))));
+  main.append(el('p', { class: 'hint' }, 'Use este material como guia. Não precisa fazer todas as perguntas se a conversa já trouxer a resposta.'));
+  main.append(el('div', { class: 'btn-row' }, el('button', { class: 'btn primary', type: 'button', onclick: () => { if (!M.timer.since) toggleTimer(); go(SECTIONS[1].id); } }, icon('play', 18), 'Iniciar reunião (liga o cronômetro)')));
+}
+
+function viewItems(sec, main) {
+  const observe = sec.kind === 'observe';
+  const list = el('div', { class: 'item-list' });
+  const paint = () => { list.replaceChildren(...rawItems(sec).map(it => itemView(sec, it, paint, observe))); requestAnimationFrame(autosizeAll); };
+  paint();
+  main.append(list);
+  main.append(el('div', { class: 'add-row' }, el('button', { class: 'btn', type: 'button', onclick: () => {
+    (M.custom[sec.id] = M.custom[sec.id] || []).push({ id: 'c_' + uid().slice(0, 8), text: '' });
+    touch(); paint(); const inputs = $$('.q-input', list); if (inputs.length) inputs[inputs.length - 1].focus();
+  } }, icon('plus', 18), observe ? 'Adicionar observação' : 'Adicionar pergunta ou tópico')));
+  main.append(notesBlock(sec));
+}
+function itemView(sec, it, repaint, observe) {
+  const get = () => M.items[it.id] || { done: false, flag: false, note: '' };
+  const st = () => M.items[it.id] || (M.items[it.id] = { done: false, flag: false, note: '' });
+  const root = el('article', { class: 'item', dataset: { id: it.id } });
+  const check = el('button', { class: 'check', type: 'button', role: 'checkbox', 'aria-label': observe ? 'Marcar como observado' : 'Marcar como perguntado', onclick: () => { const s = st(); s.done = !s.done; sync(); touch(); updateNav(); } }, icon('check', 20));
+  const flag = el('button', { class: 'iconbtn', type: 'button', title: 'Marcar como dor / oportunidade', 'aria-label': 'Marcar como dor ou oportunidade', onclick: () => { const s = st(); s.flag = !s.flag; sync(); touch(); updateNav(); } }, icon('flag', 20));
+  const sync = () => { const s = get(); root.classList.toggle('done', !!s.done); root.classList.toggle('flag', !!s.flag); check.setAttribute('aria-checked', String(!!s.done)); flag.setAttribute('aria-pressed', String(!!s.flag)); };
+  let q;
+  if (it.custom) q = el('input', { class: 'q-input', type: 'text', placeholder: observe ? 'Escreva o que observou…' : 'Escreva a pergunta ou o tópico…', value: it.text, 'aria-label': 'Texto do tópico', oninput: e => { it.ref.text = e.target.value; touch(); updateNav(); } });
+  else q = el('p', { class: 'q' }, it.text);
+  const actions = el('div', { class: 'actions' }, flag);
+  if (it.custom) actions.append(el('button', { class: 'iconbtn', type: 'button', title: 'Remover este tópico', 'aria-label': 'Remover este tópico', onclick: async () => {
+    const s = get();
+    if ((s.note || '').trim() || it.text.trim()) { if (!(await ask({ title: 'Remover tópico?', text: 'A pergunta e a anotação dela serão apagadas.', ok: 'Remover', danger: true }))) return; }
+    M.custom[sec.id] = (M.custom[sec.id] || []).filter(c => c.id !== it.id); delete M.items[it.id]; touch(); repaint(); updateNav();
+  } }, icon('trash', 19)));
+  const note = el('textarea', { class: 'note', rows: 2, placeholder: observe ? 'O que você percebeu…' : 'Resposta e anotações…', 'aria-label': 'Anotação', value: get().note || '' });
+  note.addEventListener('input', () => {
+    const s = st(), was = !(s.note || '').trim(); s.note = note.value;
+    if (was && note.value.trim() && !s.done) s.done = true;
+    sync(); autosize(note); touch(); updateNav();
+  });
+  root.append(check, q, actions, note); sync();
+  return root;
+}
+
+function viewImportant(sec, main) {
+  main.append(el('div', { class: 'key-card' }, el('span', { class: 'eyebrow' }, 'Pergunta-chave'),
+    el('p', { class: 'key-q' }, 'Se nosso trabalho desse ', el('em', {}, 'MUITO certo'), ' nos próximos 3 meses, o que teria mudado para vocês?')));
+  const chips = el('div', { class: 'chips' });
+  const paint = () => chips.replaceChildren(...DREAMS.map(d => {
+    const i = M.dream.indexOf(d);
+    return el('button', { class: 'chip', type: 'button', 'aria-pressed': String(i >= 0), onclick: () => { if (i >= 0) M.dream.splice(i, 1); else M.dream.push(d); touch(); paint(); updateNav(); } },
+      i >= 0 ? el('span', { class: 'rank' }, String(i + 1)) : null, d);
+  }));
+  paint();
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'O que o cliente citou?'),
+    el('p', { class: 'hint', style: 'margin-bottom:12px' }, 'Toque conforme ele for falando. O número mostra a ordem de prioridade (toque de novo para remover).'), chips,
+    el('div', { class: 'form-grid', style: 'margin-top:16px' },
+      field('Outro resultado citado', () => M.dreamOther, v => { M.dreamOther = v; }, { placeholder: 'Algo que não está na lista', wide: true }),
+      field('Palavras do próprio cliente (anote literalmente)', () => M.dreamQuote, v => { M.dreamQuote = v; }, { multiline: true, placeholder: '“…”', wide: true }))));
+  main.append(notesBlock(sec));
+}
+
+function viewSummary(sec, main) {
+  const flagged = flaggedList();
+  const box = el('div', { class: 'card' }, el('h2', {}, 'Marcados como dor / oportunidade'));
+  if (!flagged.length) box.append(el('p', { class: 'hint' }, 'Use a bandeira ⚑ durante a conversa — o que você marcar aparece aqui, pronto para virar oportunidade.'));
+  else box.append(el('div', { class: 'flag-list' }, flagged.map(({ sec: s, it, s: st }) => {
+    const note = (st.note || '').trim();
+    return el('button', { class: 'flag-link', type: 'button', onclick: () => goItem(s.id, it.id) },
+      el('span', { class: 'tag' }, s.n != null ? `${s.n}. ${s.short}` : s.short),
+      el('span', { class: 'tx' }, el('b', {}, it.text || '(sem texto)'), note ? el('span', {}, note.length > 160 ? note.slice(0, 160) + '…' : note) : null));
+  })));
+  main.append(box);
+
+  const R = M.resumo, r = (label, key, o) => field(label, () => R[key], v => { R[key] = v; }, { multiline: true, ...o });
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'Oportunidades'),
+    el('div', { class: 'sum-grid' }, r('Oportunidade 1', 'op1', { placeholder: '…' }), r('Oportunidade 2', 'op2', { placeholder: '…' }), r('Oportunidade 3', 'op3', { placeholder: '…' }))));
+
+  const prio = r('Prioridade do cliente', 'prioridade', { placeholder: 'O que ele mais quer resolver', wide: true });
+  const dreamTxt = M.dream.map((d, i) => `${i + 1}º ${d}`).join(' · ');
+  const prioCard = el('div', { class: 'card' }, el('h2', {}, 'Prioridade do cliente'), prio);
+  prio.querySelector('.lbl').classList.add('sr-only');
+  if (dreamTxt) {
+    prioCard.append(el('div', { class: 'btn-row' }, el('button', { class: 'btn small', type: 'button', onclick: () => {
+      const t = $('textarea', prio), add = dreamTxt + (M.dreamQuote.trim() ? ` — “${M.dreamQuote.trim()}”` : '');
+      t.value = t.value.trim() ? t.value.trim() + '\n' + add : add; R.prioridade = t.value; autosize(t); touch(); updateNav();
+    } }, icon('plus', 16), 'Usar o que ele respondeu na pergunta 8'), el('span', { class: 'hint', style: 'align-self:center' }, dreamTxt)));
+  }
+  main.append(prioCard);
+
+  const chips = el('div', { class: 'chips' });
+  const paint = () => chips.replaceChildren(...SERVICES.map(sv => {
+    const on = M.services.includes(sv);
+    return el('button', { class: 'chip', type: 'button', 'aria-pressed': String(on), onclick: () => { if (on) M.services = M.services.filter(x => x !== sv); else M.services.push(sv); touch(); paint(); updateNav(); } }, on ? icon('check', 16) : null, sv);
+  }));
+  paint();
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'Serviços que fazem sentido'), chips,
+    el('div', { class: 'form-grid', style: 'margin-top:14px' }, field('Outro serviço', () => M.servicesOther, v => { M.servicesOther = v; }, { placeholder: 'Opcional', wide: true }))));
+
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'Próxima ação'), (() => { const f = r('Próxima ação', 'proxima', { placeholder: 'O que acontece depois desta reunião?', wide: true }); f.querySelector('.lbl').classList.add('sr-only'); return f; })()));
+  main.append(el('p', { class: 'hint', style: 'text-align:center' }, sec.foot));
+}
+
+function viewClosing(sec, main) {
+  const R = M.resumo, blank = el('span', { class: 'blank' }, '________');
+  const part = k => (R[k] || '').trim() ? el('mark', {}, R[k].trim().replace(/\s*\n\s*/g, ' ')) : blank.cloneNode(true);
+  main.append(el('div', { class: 'script' }, '“Pelo que entendi, hoje as maiores oportunidades são ', part('op1'), ', ', part('op2'), ' e ', part('op3'), '. Vou montar uma proposta pensando nisso, em vez de simplesmente colocar um pacote pronto na mesa.”'));
+  const plain = () => { const g = k => (R[k] || '').trim().replace(/\s*\n\s*/g, ' ') || '________'; return `Pelo que entendi, hoje as maiores oportunidades são ${g('op1')}, ${g('op2')} e ${g('op3')}. Vou montar uma proposta pensando nisso, em vez de simplesmente colocar um pacote pronto na mesa.`; };
+  main.append(el('div', { class: 'btn-row', style: 'margin:-4px 0 16px' }, el('button', { class: 'btn small', type: 'button', onclick: () => copyText(plain()) }, icon('copy', 16), 'Copiar fala'),
+    el('button', { class: 'btn small ghost', type: 'button', onclick: () => go('resumo') }, 'Editar oportunidades no resumo')));
+  const C = M.closing, f = (label, key, o) => field(label, () => C[key], v => { C[key] = v; }, o);
+  main.append(el('div', { class: 'card' }, el('h2', {}, 'Combine o próximo passo'),
+    el('p', { class: 'hint', style: 'margin-bottom:12px' }, 'Quando você enviará a proposta, quem receberá e quando vocês voltam a conversar.'),
+    el('div', { class: 'form-grid' },
+      f('Enviar a proposta até', 'proposta', { type: 'date' }),
+      f('Quem vai receber', 'quem', { placeholder: 'Nome e contato' }),
+      f('Próxima conversa', 'retorno', { type: 'datetime-local', wide: true }))));
+  main.append(el('div', { class: 'closing-end' }, el('h2', {}, 'Encerrar a reunião'),
+    el('p', {}, 'Gere o relatório e guarde uma cópia: imprima/salve em PDF, baixe o texto ou o backup completo.'),
+    el('div', { class: 'btn-row' },
+      el('button', { class: 'btn primary', type: 'button', onclick: () => { if (M.timer.since) toggleTimer(); openReport(); } }, icon('file', 18), 'Encerrar e gerar relatório'),
+      el('button', { class: 'btn', type: 'button', onclick: () => openSave() }, icon('save', 18), 'Opções de salvamento'))));
+  main.append(el('p', { class: 'tagline' }, el('b', {}, 'OUÇA MAIS DO QUE APRESENTA.'), el('br'), 'Grimora | Transformando Ideias em Realidade.'));
+}
+
+/* =====================================================================
+   RELATÓRIO
+   ===================================================================== */
+function collect() {
+  const I = M.info, secs = []; let total = 0, done = 0;
+  for (const sec of SECTIONS) {
+    if (sec.kind === 'questions' || sec.kind === 'observe') {
+      const all = countedItems(sec); total += all.length; const rows = [];
+      for (const it of all) { const s = M.items[it.id] || {}; if (s.done) done++; const note = (s.note || '').trim(); if (note || s.flag) rows.push({ q: it.text.trim(), note, flag: !!s.flag }); }
+      const note = (M.secNotes[sec.id] || '').trim();
+      if (rows.length || note) secs.push({ sec, rows, note });
+    } else if (sec.kind === 'important') {
+      const note = (M.secNotes[sec.id] || '').trim(), other = M.dreamOther.trim(), quote = M.dreamQuote.trim();
+      if (M.dream.length || other || quote || note) secs.push({ sec, rows: [], note, dream: { ranked: M.dream.slice(), other, quote } });
+    }
+  }
+  const flagged = []; secs.forEach(x => x.rows.forEach(r => r.flag && flagged.push({ sec: x.sec, ...r })));
+  const services = [...M.services]; if (M.servicesOther.trim()) services.push(M.servicesOther.trim());
+  return { I, secs, total, done, flagged, services, R: M.resumo, C: M.closing, scratch: M.scratch.trim(), duration: elapsed() };
+}
+const secTitle = s => s.n != null ? `${s.n}. ${s.title}` : s.title;
+function reportText() {
+  const r = collect(), L = [], I = r.I, hr = '='.repeat(46), sub = t => { L.push('', t.toUpperCase(), '-'.repeat(t.length)); };
+  L.push('GRIMORA · DIAGNÓSTICO DE MARKETING', hr);
+  const info = [['Lanchonete', I.negocio], ['Contato', I.contato], ['Telefone', I.telefone], ['Instagram', I.instagram], ['Data', fmtDT(I.data)], ['Local', I.local], ['Participantes', I.participantes]];
+  info.forEach(([k, v]) => v && v.trim() && L.push(`${k}: ${v.trim().replace(/\n/g, ' / ')}`));
+  L.push(`Duração: ${fmtDur(r.duration)} · Tópicos abordados: ${r.done} de ${r.total}`);
+  sub('Resumo do diagnóstico');
+  const v = x => (x || '').trim().replace(/\n/g, '\n    ') || '—';
+  L.push(`Oportunidade 1: ${v(r.R.op1)}`, `Oportunidade 2: ${v(r.R.op2)}`, `Oportunidade 3: ${v(r.R.op3)}`, `Prioridade do cliente: ${v(r.R.prioridade)}`, `Serviços que fazem sentido: ${r.services.length ? r.services.join('; ') : '—'}`, `Próxima ação: ${v(r.R.proxima)}`);
+  sub('Próximos passos combinados');
+  L.push(`Enviar a proposta até: ${fmtDate(r.C.proposta) || '—'}`, `Quem vai receber: ${v(r.C.quem)}`, `Próxima conversa: ${fmtDT(r.C.retorno) || '—'}`);
+  if (r.flagged.length) { sub('Marcados como dor / oportunidade'); r.flagged.forEach(f => { L.push(`⚑ [${secTitle(f.sec)}] ${f.q}`); if (f.note) L.push('    ' + f.note.replace(/\n/g, '\n    ')); }); }
+  if (r.secs.length) {
+    sub('Anotações por seção');
+    for (const x of r.secs) {
+      L.push('', secTitle(x.sec));
+      if (x.dream) {
+        if (x.dream.ranked.length) L.push('  Resultados citados (por prioridade): ' + x.dream.ranked.map((d, i) => `${i + 1}º ${d}`).join(' · '));
+        if (x.dream.other) L.push('  Outro: ' + x.dream.other);
+        if (x.dream.quote) L.push('  Palavras do cliente: “' + x.dream.quote.replace(/\n/g, ' ') + '”');
+      }
+      for (const row of x.rows) { L.push(`  • ${row.flag ? '⚑ ' : ''}${row.q}`); L.push('    → ' + (row.note ? row.note.replace(/\n/g, '\n      ') : '(sem anotação)')); }
+      if (x.note) L.push('  Anotações da seção: ' + x.note.replace(/\n/g, '\n    '));
+    }
+  }
+  if (r.scratch) { sub('Bloco de notas'); L.push(r.scratch); }
+  L.push('', hr, 'Grimora | Transformando Ideias em Realidade.');
+  return L.join('\n');
+}
+function buildPrint() {
+  const r = collect(), I = r.I, root = $('#print'); root.replaceChildren();
+  const kv = (k, v) => v && String(v).trim() ? el('tr', {}, el('td', {}, k), el('td', {}, String(v).trim())) : null;
+  const val = x => (x || '').trim() || '—';
+  root.append(el('div', { class: 'p-brand' }, 'GRIMORA'), el('h1', {}, 'Diagnóstico de Marketing'),
+    el('p', { class: 'p-meta' }, [I.negocio.trim(), fmtDT(I.data)].filter(Boolean).join(' · ')),
+    el('table', {}, kv('Contato', I.contato), kv('Telefone', I.telefone), kv('Instagram', I.instagram), kv('Local', I.local), kv('Participantes', I.participantes), kv('Duração', fmtDur(r.duration)), kv('Tópicos abordados', `${r.done} de ${r.total}`)),
+    el('h2', {}, 'Resumo do diagnóstico'),
+    el('table', {}, kv('Oportunidade 1', val(r.R.op1)), kv('Oportunidade 2', val(r.R.op2)), kv('Oportunidade 3', val(r.R.op3)), kv('Prioridade do cliente', val(r.R.prioridade)), kv('Serviços que fazem sentido', r.services.length ? r.services.join(' · ') : '—'), kv('Próxima ação', val(r.R.proxima))),
+    el('h2', {}, 'Próximos passos combinados'),
+    el('table', {}, kv('Enviar a proposta até', fmtDate(r.C.proposta) || '—'), kv('Quem vai receber', val(r.C.quem)), kv('Próxima conversa', fmtDT(r.C.retorno) || '—')));
+  if (r.flagged.length) {
+    root.append(el('h2', {}, 'Marcados como dor / oportunidade'));
+    r.flagged.forEach(f => root.append(el('div', { class: 'qa flag' }, el('p', { class: 'q' }, `${f.q}  (${secTitle(f.sec)})`), f.note ? el('p', { class: 'a' }, f.note) : null)));
+  }
+  if (r.secs.length) {
+    root.append(el('h2', {}, 'Anotações por seção'));
+    for (const x of r.secs) {
+      root.append(el('h3', {}, secTitle(x.sec)));
+      if (x.dream) {
+        if (x.dream.ranked.length) root.append(el('div', { class: 'qa' }, el('p', { class: 'q' }, 'Resultados citados (por prioridade)'), el('p', { class: 'a' }, x.dream.ranked.map((d, i) => `${i + 1}º ${d}`).join('\n'))));
+        if (x.dream.other) root.append(el('div', { class: 'qa' }, el('p', { class: 'q' }, 'Outro resultado'), el('p', { class: 'a' }, x.dream.other)));
+        if (x.dream.quote) root.append(el('div', { class: 'qa' }, el('p', { class: 'q' }, 'Palavras do cliente'), el('p', { class: 'a' }, '“' + x.dream.quote + '”')));
+      }
+      for (const row of x.rows) root.append(el('div', { class: 'qa' + (row.flag ? ' flag' : '') }, el('p', { class: 'q' }, row.q), row.note ? el('p', { class: 'a' }, row.note) : el('p', { class: 'a none' }, '(sem anotação)')));
+      if (x.note) root.append(el('div', { class: 'qa' }, el('p', { class: 'q' }, 'Anotações da seção'), el('p', { class: 'a' }, x.note)));
+    }
+  }
+  if (r.scratch) root.append(el('h2', {}, 'Bloco de notas'), el('p', { style: 'white-space:pre-wrap' }, r.scratch));
+  root.append(el('p', { class: 'p-meta', style: 'margin-top:20pt;text-align:center' }, 'Grimora | Transformando Ideias em Realidade.'));
+}
+function doPrint() { closeDialogs(); buildPrint(); setTimeout(() => window.print(), 60); }
+function openReport() {
+  flush(); const txt = reportText(), name = `grimora-relatorio-${slug(M.info.negocio) || 'reuniao'}-${todayStamp()}`;
+  $('#reportBody').replaceChildren(
+    el('header', {}, el('h2', {}, 'Relatório da reunião'), el('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Fechar', onclick: closeDialogs }, icon('x'))),
+    el('p', { class: 'hint' }, 'Pré-visualização do que será exportado. Só entram tópicos com anotação ou bandeira.'),
+    el('pre', { class: 'preview' }, txt),
+    el('div', { class: 'btn-row', style: 'margin:0' },
+      el('button', { class: 'btn primary', type: 'button', onclick: doPrint }, icon('printer', 18), 'Imprimir / salvar PDF'),
+      el('button', { class: 'btn', type: 'button', onclick: () => copyText(txt) }, icon('copy', 18), 'Copiar texto'),
+      el('button', { class: 'btn', type: 'button', onclick: () => download(name + '.txt', '﻿' + txt, 'text/plain;charset=utf-8') }, icon('download', 18), 'Baixar .txt'),
+      el('button', { class: 'btn', type: 'button', onclick: () => { download(backupName(), JSON.stringify(exportPayload(), null, 2), 'application/json'); } }, icon('save', 18), 'Backup completo (.json)')));
+  $('#dlgReport').showModal();
+}
+
+/* =====================================================================
+   DIÁLOGOS: salvar, reuniões
+   ===================================================================== */
+function closeDialogs() { $$('dialog[open]').forEach(d => d.close()); }
+function refreshDialogs() { if ($('#dlgSave').open) buildSave(); if ($('#dlgMeetings').open) buildMeetings(); }
+function buildSave() {
+  const body = $('#saveBody');
+  let status;
+  if (!lsOk) status = ['err', 'O navegador não está deixando salvar aqui. Use o backup abaixo agora.'];
+  else if (fileHandle && fileState === 'ok') status = ['ok', `Salvando automaticamente em “${fileHandle.name}”${fileSaved ? ' · último: ' + fmtHM(fileSaved) : ''}`];
+  else if (fileHandle && fileState === 'perm') status = ['warn', `Arquivo “${fileHandle.name}” vinculado, mas o navegador pede para você liberar o acesso de novo.`];
+  else if (fileState === 'error') status = ['err', 'Não consegui gravar no arquivo: ' + fileErr];
+  else status = ['warn', 'Por enquanto só neste navegador' + (lastSaved ? ' · salvo às ' + fmtHM(lastSaved) : '')];
+  const fileBlock = el('div', { class: 'block' }, el('h3', {}, 'Cópia automática em arquivo (recomendado)'),
+    el('div', { class: 'status-line ' + status[0] }, el('span', { class: 'dot' }), status[1]));
+  if (FS) {
+    fileBlock.append(el('p', {}, 'Escolha uma pasta e um nome uma única vez. Depois disso, cada anotação é gravada sozinha nesse arquivo — mesmo que você feche o navegador ou desligue o computador.'));
+    const row = el('div', { class: 'btn-row', style: 'margin:0' });
+    if (!fileHandle) row.append(el('button', { class: 'btn primary', type: 'button', onclick: linkFile }, icon('link', 18), 'Escolher arquivo e salvar automaticamente'));
+    else {
+      if (fileState === 'perm') row.append(el('button', { class: 'btn primary', type: 'button', onclick: reconnectFile }, icon('link', 18), 'Reconectar arquivo'));
+      else row.append(el('button', { class: 'btn primary', type: 'button', onclick: async () => { flush(); await writeFile(); refreshDialogs(); toast(fileState === 'ok' ? 'Salvo no arquivo.' : 'Não foi possível salvar.'); } }, icon('save', 18), 'Salvar agora'));
+      row.append(el('button', { class: 'btn', type: 'button', onclick: linkFile }, 'Trocar arquivo'), el('button', { class: 'btn ghost', type: 'button', onclick: unlinkFile }, 'Desvincular'));
+    }
+    fileBlock.append(row);
+  } else fileBlock.append(el('p', { style: 'margin:0' }, 'Este navegador não permite gravar direto em arquivo. Abra este roteiro no Google Chrome ou no Microsoft Edge para ter o salvamento automático — ou use o backup manual abaixo.'));
+  body.replaceChildren(
+    el('header', {}, el('h2', {}, 'Salvar e backup'), el('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Fechar', onclick: closeDialogs }, icon('x'))),
+    el('p', { class: 'hint' }, 'Tudo que você digita já é guardado neste navegador na hora. Mas se os dados do navegador forem limpos, somem — por isso vale ter uma cópia em arquivo.'),
+    fileBlock,
+    el('div', { class: 'block' }, el('h3', {}, 'Backup manual'),
+      el('p', {}, 'Baixa (ou reabre) um arquivo com todas as anotações desta reunião. Serve para guardar, mandar por e-mail ou levar para outro computador.'),
+      el('div', { class: 'btn-row', style: 'margin:0' },
+        el('button', { class: 'btn', type: 'button', onclick: () => { flush(); download(backupName(), JSON.stringify(exportPayload(), null, 2), 'application/json'); toast('Backup baixado.'); } }, icon('download', 18), 'Baixar backup (.json)'),
+        el('button', { class: 'btn', type: 'button', onclick: openBackup }, icon('upload', 18), 'Abrir backup…'))),
+    el('div', { class: 'block' }, el('h3', {}, 'Relatório'), el('p', {}, 'Texto limpo e PDF para enviar ao cliente ou arquivar.'),
+      el('div', { class: 'btn-row', style: 'margin:0' }, el('button', { class: 'btn', type: 'button', onclick: () => { closeDialogs(); openReport(); } }, icon('file', 18), 'Gerar relatório…'))));
+}
+function openSave() { flush(); buildSave(); if (!$('#dlgSave').open) $('#dlgSave').showModal(); }
+function buildMeetings() {
+  const body = $('#meetingsBody'), s = readStore(); s.meetings[M.id] = M;
+  const rows = Object.values(s.meetings).map(m => normalize(m)).sort((a, b) => b.updatedAt - a.updatedAt);
+  body.replaceChildren(
+    el('header', {}, el('h2', {}, 'Reuniões'), el('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Fechar', onclick: closeDialogs }, icon('x'))),
+    el('div', { class: 'btn-row', style: 'margin:0' },
+      el('button', { class: 'btn primary', type: 'button', onclick: newMeetingFlow }, icon('plus', 18), 'Nova reunião'),
+      el('button', { class: 'btn', type: 'button', onclick: openBackup }, icon('upload', 18), 'Abrir backup…')),
+    el('div', { class: 'mlist' }, rows.map(m => {
+      const o = overall(m), cur = m.id === M.id;
+      return el('div', { class: 'mrow' + (cur ? ' current' : '') },
+        el('div', { class: 'info' }, el('b', {}, m.info.negocio.trim() || 'Reunião sem nome'), el('span', {}, `${fmtDT(m.info.data) || fmtDT(new Date(m.createdAt).toISOString())} · ${o.done}/${o.total} tópicos`)),
+        cur ? el('span', { class: 'hint' }, 'Aberta') : el('button', { class: 'btn small', type: 'button', onclick: () => switchTo(m.id) }, 'Abrir'),
+        el('button', { class: 'iconbtn', type: 'button', title: 'Excluir esta reunião', 'aria-label': 'Excluir esta reunião', onclick: () => deleteMeeting(m.id) }, icon('trash', 18)));
+    })),
+    el('p', { class: 'hint' }, 'Cada reunião tem as próprias anotações e o próprio arquivo vinculado. Excluir aqui não apaga arquivos já salvos no computador.'));
+}
+function openMeetings() { flush(); buildMeetings(); $('#dlgMeetings').showModal(); }
+async function switchTo(id) {
+  flush(); const m = readStore().meetings[id]; if (!m) return;
+  M = normalize(m); settleTimerOnLoad(); persistLS(); await loadHandle(); closeDialogs(); renderAll();
+}
+async function newMeetingFlow() {
+  flush(); M = newMeeting(); persistLS(); await loadHandle(); closeDialogs(); renderAll();
+  toast('Nova reunião criada. A anterior continua na lista “Reuniões”.');
+  setTimeout(() => { const f = $('.field input'); if (f) f.focus(); }, 50);
+}
+async function deleteMeeting(id) {
+  const s = readStore(), m = s.meetings[id] || (id === M.id ? M : null); if (!m) return;
+  const name = m.info.negocio.trim() || 'Reunião sem nome';
+  if (!(await ask({ title: `Excluir “${name}”?`, text: 'As anotações deste navegador serão apagadas. Se você tem um backup ou arquivo vinculado, ele continua no computador.', ok: 'Excluir', danger: true }))) return;
+  delete s.meetings[id]; try { writeStore(s); } catch (_) {} await idbDel(id);
+  if (id === M.id) {
+    const next = Object.values(s.meetings).sort((a, b) => b.updatedAt - a.updatedAt)[0];
+    M = next ? normalize(next) : newMeeting(); settleTimerOnLoad(); persistLS(); await loadHandle(); renderAll();
+  }
+  buildMeetings();
+}
+
+/* =====================================================================
+   INICIALIZAÇÃO
+   ===================================================================== */
+function renderAll() { renderTop(); renderNav(); renderSection(false); renderTimer(); updateChip(); updateBanner(); $('#scratch').value = M.scratch; requestAnimationFrame(updateTopbarHeight); }
+
+async function init() {
+  document.querySelectorAll('[data-icon]').forEach(n => n.replaceChildren(icon(n.dataset.icon)));
+  const s = readStore();
+  const latest = Object.values(s.meetings).sort((a, b) => b.updatedAt - a.updatedAt)[0];
+  const m = (s.currentId && s.meetings[s.currentId]) || latest;
+  M = m ? normalize(m) : newMeeting(); settleTimerOnLoad(); persistLS();
+  applyTheme(); renderAll();
+  await loadHandle();
+
+  $('#btnMeetings').onclick = openMeetings;
+  $('#btnTimer').onclick = toggleTimer; $('#btnTimerReset').onclick = resetTimer;
+  $('#chip').onclick = () => (fileHandle && fileState === 'perm') ? reconnectFile() : openSave();
+  $('#btnReport').onclick = openReport; $('#btnTheme').onclick = toggleTheme;
+  const toggleNotes = () => { const d = $('#drawer'); d.hidden = !d.hidden; if (!d.hidden) $('#scratch').focus(); };
+  $('#btnNotes').onclick = toggleNotes; $('#fabNotes').onclick = toggleNotes;
+  $('#btnDrawerClose').onclick = () => { $('#drawer').hidden = true; };
+  $('#scratch').addEventListener('input', e => { M.scratch = e.target.value; touch(); });
+  $('#btnStamp').onclick = () => {
+    const t = $('#scratch'), stamp = `[${fmtClock(elapsed())}] `, pre = t.value && !t.value.endsWith('\n') ? '\n' : '';
+    t.value += pre + stamp; M.scratch = t.value; t.focus(); t.setSelectionRange(t.value.length, t.value.length); touch();
+  };
+  $('#bannerClose').onclick = () => { settings.bannerDismissed = true; saveSettings(); updateBanner(); };
+  $('#bannerAction').onclick = () => FS ? linkFile() : openSave();
+  $('#fileInput').addEventListener('change', async e => { const f = e.target.files[0]; e.target.value = ''; if (f) await importFromText(await f.text(), null); });
+  $$('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
+
+  setInterval(() => { if (M.timer.since) $('#timerText').textContent = fmtClock(elapsed()); }, 1000);
+  window.addEventListener('resize', () => { updateTopbarHeight(); autosizeAll(); });
+  window.addEventListener('beforeprint', buildPrint);
+  window.addEventListener('pagehide', flush);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+  window.addEventListener('beforeunload', e => { flush(); if (fileHandle && dirtyFile && fileState !== 'ok') { e.preventDefault(); e.returnValue = ''; } });
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault(); flush();
+      if (fileHandle && fileState === 'ok') writeFile().then(() => toast('Salvo no arquivo.')); else { toast('Salvo no navegador. Para ter também uma cópia em arquivo, clique no indicador de salvamento (no topo).'); }
+    } else if (e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      e.preventDefault(); const t = SECTIONS[idx() + (e.key === 'ArrowRight' ? 1 : -1)]; if (t) go(t.id);
+    } else if (e.key === 'Escape' && !$('#drawer').hidden && !$('dialog[open]')) { $('#drawer').hidden = true; }
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+}
+init();
+})();
+</script>
+</body>
+</html>
